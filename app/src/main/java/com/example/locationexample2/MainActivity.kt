@@ -44,36 +44,40 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = createLocationRequest()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
         viewModel.locationLiveData.observe(this, androidx.lifecycle.Observer {
             updateUI(it)
         })
 
-        if (isLocatiponPermissionGranted().first) {
-            if (isLocationEnable()) {
-                fusedLocationClient.lastLocation.addOnSuccessListener {
-                    if(it != null){
-                        geocoder = Geocoder(this, Locale.getDefault())
-                        val address = geocoder.getFromLocation(it.latitude, it.longitude, 2)
-                        Log.e("#######", "onCreate: $address" )
-                       // viewModel.setViewModelLocation(address!!)
-                        viewModel.setViewModelLocation(address!!)
+        mainBinding!!.findLocationBtn.setOnClickListener {
 
-                    }else{
-                        locationRequest = createLocationRequest()
+            if (isLocatiponPermissionGranted().first) {
+                if (isLocationEnable()) {
+                    fusedLocationClient.lastLocation.addOnSuccessListener {
+                        if (it != null) {
+                            geocoder = Geocoder(this, Locale.getDefault())
+                            val address = geocoder.getFromLocation(it.latitude, it.longitude, 2)
+                            Log.e("#######", "onCreate: $address")
+                            // viewModel.setViewModelLocation(address!!)
+                            viewModel.setViewModelLocation(address!!)
 
-                        startLocationAlert()
+                        } else {
+                            locationRequest = createLocationRequest()
+
+                            startLocationAlert()
+                        }
+
                     }
-
+                } else {
+                    Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
+                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivity(intent)
                 }
             } else {
-                Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                startActivity(intent)
+                requestLocationPermisson();
             }
-        } else {
-            requestLocationPermisson();
         }
+
+
 
 
     }
