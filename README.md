@@ -1,2 +1,2 @@
 # ForegroundLocationExample
-A simple Foregrounf location  app
+a simple app which get callback of latitude and logitude
